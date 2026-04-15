@@ -1,0 +1,112 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "quantum-automl"
+version = "0.1.0"
+description = "Automated Machine Learning for Quantum Computing — bring your data, we build the quantum model."
+readme = "README.md"
+license = { file = "LICENSE" }
+requires-python = ">=3.9"
+authors = [
+    { name = "quantum-automl contributors" },
+]
+keywords = [
+    "quantum computing",
+    "machine learning",
+    "automl",
+    "qiskit",
+    "quantum machine learning",
+    "variational quantum circuits",
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Science/Research",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Topic :: Scientific/Engineering :: Physics",
+]
+
+# ──────────────────────────────────────────────────────────────────────────────
+# Core dependencies — all pinned to ranges that work on low-end hardware.
+# qiskit-aer ships a pure-Python simulator fallback so no C++ GPU required.
+# ──────────────────────────────────────────────────────────────────────────────
+dependencies = [
+    # Quantum stack
+    "qiskit>=1.0.0,<2.0.0",
+    "qiskit-machine-learning>=0.7.0,<1.0.0",
+    "qiskit-algorithms>=0.3.0,<1.0.0",
+    "qiskit-aer>=0.14.0,<1.0.0",          # includes statevector + QASM sim
+
+    # Classical ML / numerics
+    "scikit-learn>=1.3.0,<2.0.0",
+    "numpy>=1.24.0,<2.0.0",
+    "pandas>=2.0.0,<3.0.0",
+
+    # Hyperparameter optimisation (optional but listed as core dep)
+    "optuna>=3.0.0,<4.0.0",
+]
+
+[project.optional-dependencies]
+# Extra packages for advanced features — not required on low-end machines
+advanced = [
+    "shap>=0.44.0",          # XAI / explainability module
+    "matplotlib>=3.7.0",     # circuit / result visualisation
+    "pylatexenc>=2.10",      # LaTeX circuit rendering via Qiskit
+]
+dev = [
+    "pytest>=7.4.0",
+    "pytest-cov>=4.1.0",
+    "ruff>=0.1.0",
+    "black>=23.0.0",
+    "mypy>=1.5.0",
+    "jupyter>=1.0.0",
+    "ipykernel>=6.0.0",
+]
+all = ["quantum-automl[advanced,dev]"]
+
+[project.urls]
+Homepage = "https://github.com/quantum-automl/quantum-automl"
+Documentation = "https://quantum-automl.readthedocs.io"
+Repository = "https://github.com/quantum-automl/quantum-automl"
+"Bug Tracker" = "https://github.com/quantum-automl/quantum-automl/issues"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/quantum_automl"]
+
+[tool.hatch.build.targets.sdist]
+include = [
+    "/src",
+    "/examples",
+    "/README.md",
+    "/LICENSE",
+    "/pyproject.toml",
+]
+
+# ── Tooling config ──────────────────────────────────────────────────────────
+[tool.ruff]
+line-length = 88
+target-version = "py39"
+select = ["E", "F", "W", "I", "N", "UP"]
+ignore = ["E501"]
+
+[tool.black]
+line-length = 88
+target-version = ["py39"]
+
+[tool.mypy]
+python_version = "3.9"
+warn_return_any = true
+warn_unused_configs = true
+ignore_missing_imports = true   # Qiskit stubs are incomplete
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-v --cov=quantum_automl"
